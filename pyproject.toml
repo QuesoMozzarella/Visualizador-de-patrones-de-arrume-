@@ -27,3 +27,5 @@ include = ["arrume*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+# Permite ejecutar "pytest" sin instalar el paquete antes
+pythonpath = ["."]

@@ -244,6 +244,10 @@ class Arrume:
 
     @property
     def aprovechamiento(self) -> float:
-        """Porcentaje de la superficie del pallet que cubre un nivel."""
+        """Porcentaje de la superficie del pallet que cubre un nivel.
+
+        Se mide contra el pallet, no contra el area disponible: si hay vuelo,
+        las cajas cubren mas que la plataforma y el valor pasa del 100 %.
+        """
         cubierto = sum(pieza.superficie for pieza in self.patron_base)
         return 100.0 * cubierto / self.pallet.superficie.superficie
