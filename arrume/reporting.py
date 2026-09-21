@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
 from .domain.models import Arrume, Numero
+from .trabazon import cajas_calcadas, calidad
 
 
 @dataclass(frozen=True)
@@ -26,19 +27,37 @@ class Informe:
     aprovechamiento: float
     peso_total: Optional[Numero]
     avisos: Tuple[str, ...]
+    trabazon: str = ""
+    trabazon_calidad: float = 0.0
+    cajas_calcadas: int = 0
+
+    @property
+    def traba(self) -> bool:
+        """True si el nivel alterno realmente pisa las juntas del de abajo."""
+        return self.trabado and self.niveles > 1 and self.cajas_calcadas == 0
 
 
 def generar_informe(arrume: Arrume) -> Informe:
     """Calcula las cifras del arrume y los avisos por limites excedidos."""
     caja = arrume.caja
+    limites = arrume.restricciones
     normales = sum(
         1
         for pieza in arrume.patron_base
         if (pieza.ancho, pieza.profundidad) == (caja.ancho, caja.profundidad)
     )
 
+    calcadas = cajas_calcadas(arrume.patron_base, arrume.patron_alterno)
+    trabazon_calidad = calidad(arrume.patron_base, arrume.patron_alterno)
+
     avisos: List[str] = []
-    limites = arrume.restricciones
+
+    if limites.trabado and arrume.niveles > 1 and calcadas == arrume.cajas_por_nivel:
+        avisos.append(
+            "El trabado no hace efecto: el patron ocupa el area sin holgura, "
+            "asi que el nivel alterno queda calcado sobre el de abajo. "
+            "Con otra medida de caja, o dejando vuelo, si trabaria."
+        )
 
     if limites.altura_max is not None and arrume.altura_total > limites.altura_max:
         avisos.append(
@@ -66,6 +85,9 @@ def generar_informe(arrume: Arrume) -> Informe:
         aprovechamiento=arrume.aprovechamiento,
         peso_total=peso,
         avisos=tuple(avisos),
+        trabazon=arrume.trabazon,
+        trabazon_calidad=trabazon_calidad,
+        cajas_calcadas=calcadas,
     )
 
 
@@ -88,6 +110,19 @@ def formatear(arrume: Arrume, informe: Optional[Informe] = None) -> str:
         "Niveles ............. {}  ({})".format(
             informe.niveles, "trabado" if informe.trabado else "en columna"
         ),
+    ]
+
+    if informe.trabado and informe.niveles > 1:
+        lineas.append(
+            "Trabazon ............ {:.0f} %  ({}, {} de {} cajas calcadas)".format(
+                100 * informe.trabazon_calidad,
+                informe.trabazon,
+                informe.cajas_calcadas,
+                informe.cajas_por_nivel,
+            )
+        )
+
+    lineas += [
         "Total de cajas ...... {}".format(informe.total_cajas),
         "Altura total ........ {} cm".format(_num(informe.altura_total)),
         "Aprovechamiento ..... {:.1f} % de la superficie del pallet".format(

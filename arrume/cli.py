@@ -16,8 +16,12 @@ from .domain.errors import ArrumeError
 from .domain.models import Caja, Numero, Pallet, Restricciones
 from .reporting import formatear
 from .stacking import construir_arrume
+from .trabazon import MejorAlterno, Rotacion180
 
 _SALIDA_POR_DEFECTO = "arrume.html"
+
+# Modos de trabazon que se pueden pedir por linea de comandos
+TRABAZONES = {"mejor": MejorAlterno, "rotacion": Rotacion180}
 
 
 def _numero(texto: str) -> Numero:
@@ -61,6 +65,11 @@ def construir_parser() -> argparse.ArgumentParser:
     trabado.add_argument(
         "--sin-trabado", dest="trabado", action="store_false",
         help="apila en columna, todos los niveles iguales",
+    )
+    parser.add_argument(
+        "--trabazon", choices=sorted(TRABAZONES), default="mejor",
+        help="'mejor' prueba varios patrones alternos; 'rotacion' es el giro "
+             "de 180 grados del proyecto original",
     )
     parser.add_argument(
         "--vuelo", type=_numero, default=0, metavar="CM",
@@ -108,7 +117,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             peso_caja=args.peso_caja,
             peso_max=args.peso_max,
         )
-        arrume = construir_arrume(pallet, caja, restricciones)
+        arrume = construir_arrume(
+            pallet, caja, restricciones, trabazon=TRABAZONES[args.trabazon]()
+        )
     except ArrumeError as error:
         print("Error: {}".format(error), file=sys.stderr)
         return 2

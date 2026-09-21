@@ -63,3 +63,18 @@ def test_sin_grafico_no_escribe_ningun_archivo(tmp_path, capsys):
     destino = tmp_path / "no-deberia-existir.html"
     assert main(["--sin-grafico", "--salida", str(destino)]) == 0
     assert not destino.exists()
+
+
+def test_se_puede_pedir_la_trabazon_vieja(capsys):
+    assert main(["--sin-grafico", "--pallet", "120", "100", "--caja", "33", "27", "20",
+                 "--trabazon", "rotacion"]) == 0
+    salida = capsys.readouterr().out
+    assert "rotacion 180" in salida
+    assert "12 de 12 cajas calcadas" in salida
+
+
+def test_por_defecto_usa_la_trabazon_que_mas_traba(capsys):
+    assert main(["--sin-grafico", "--pallet", "120", "100", "--caja", "33", "27", "20"]) == 0
+    salida = capsys.readouterr().out
+    assert "mejor alterno" in salida
+    assert "0 de 12 cajas calcadas" in salida

@@ -215,6 +215,8 @@ class Arrume:
     patron_base: tuple
     cajas: tuple
     estrategia: str
+    patron_alterno: tuple = ()
+    trabazon: str = ""
 
     def __post_init__(self) -> None:
         if not self.patron_base:
