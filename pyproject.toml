@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "arrume"
+version = "0.1.0"
+description = "Generador y visualizador 3D de patrones de arrume (pallet loading)"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "plotly>=5.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "hypothesis>=6.0",
+]
+
+[project.scripts]
+arrume = "arrume.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["arrume*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
