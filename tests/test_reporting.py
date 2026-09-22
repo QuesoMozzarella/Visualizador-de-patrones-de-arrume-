@@ -47,7 +47,9 @@ def test_puede_avisar_de_las_dos_cosas_a_la_vez():
 
 
 def test_no_avisa_cuando_esta_dentro_de_los_limites():
-    informe = generar_informe(_arrume(niveles=5, altura_max=180, peso_caja=1, peso_max=500))
+    informe = generar_informe(
+        _arrume(niveles=5, altura_max=180, peso_caja=1, peso_max=500)
+    )
     assert informe.avisos == ()
 
 

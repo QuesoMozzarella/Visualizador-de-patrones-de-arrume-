@@ -54,4 +54,4 @@ def mide_la_caja(pieza, caja) -> bool:
     """La pieza debe ser la caja, en una de sus dos orientaciones sobre Z."""
     lados = sorted((pieza.ancho, pieza.profundidad))
     esperado = sorted((caja.ancho, caja.profundidad))
-    return all(abs(a - b) < TOL for a, b in zip(lados, esperado))
+    return all(abs(a - b) < TOL for a, b in zip(lados, esperado, strict=True))

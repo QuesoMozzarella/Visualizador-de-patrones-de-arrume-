@@ -10,10 +10,10 @@ from __future__ import annotations
 import pytest
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
+from invariantes import TOL, fuera_del_area, mide_la_caja, sin_solapamientos_2d
 
 from arrume.domain.models import Area
 from arrume.packing import Guillotina
-from invariantes import TOL, fuera_del_area, mide_la_caja, sin_solapamientos_2d
 
 ESTRATEGIAS = [Guillotina()]
 

@@ -11,7 +11,8 @@ como llenar UN nivel, la otra como encadenar DOS.
 
 from __future__ import annotations
 
-from typing import List, Optional, Protocol, Sequence, runtime_checkable
+from collections.abc import Iterator, Sequence
+from typing import Protocol, runtime_checkable
 
 from .domain.models import Area, Numero, Pieza
 from .packing.base import EstrategiaPatron
@@ -79,7 +80,7 @@ class Trabazon(Protocol):
         area: Area,
         caja: Area,
         estrategia: EstrategiaPatron,
-    ) -> List[Pieza]:
+    ) -> list[Pieza]:
         ...
 
 
@@ -88,7 +89,13 @@ class SinTrabazon:
 
     nombre = "en columna"
 
-    def alterno(self, base, area, caja, estrategia):
+    def alterno(
+        self,
+        base: Sequence[Pieza],
+        area: Area,
+        caja: Area,
+        estrategia: EstrategiaPatron,
+    ) -> list[Pieza]:
         return list(base)
 
 
@@ -102,7 +109,13 @@ class Rotacion180:
 
     nombre = "rotacion 180"
 
-    def alterno(self, base, area, caja, estrategia):
+    def alterno(
+        self,
+        base: Sequence[Pieza],
+        area: Area,
+        caja: Area,
+        estrategia: EstrategiaPatron,
+    ) -> list[Pieza]:
         return rotar_180(list(base), area)
 
 
@@ -121,21 +134,33 @@ class MejorAlterno:
 
     nombre = "mejor alterno"
 
-    def alterno(self, base, area, caja, estrategia):
-        base = list(base)
-        mejor = base
+    def alterno(
+        self,
+        base: Sequence[Pieza],
+        area: Area,
+        caja: Area,
+        estrategia: EstrategiaPatron,
+    ) -> list[Pieza]:
+        piezas = list(base)
+        mejor = piezas
         mejor_calidad = 0.0
 
-        for candidato in self._candidatos(base, area, caja, estrategia):
-            if len(candidato) != len(base):
+        for candidato in self._candidatos(piezas, area, caja, estrategia):
+            if len(candidato) != len(piezas):
                 continue
-            puntaje = calidad(base, candidato)
+            puntaje = calidad(piezas, candidato)
             if puntaje > mejor_calidad + _TOL:
                 mejor, mejor_calidad = candidato, puntaje
 
         return mejor
 
-    def _candidatos(self, base, area, caja, estrategia):
+    def _candidatos(
+        self,
+        base: list[Pieza],
+        area: Area,
+        caja: Area,
+        estrategia: EstrategiaPatron,
+    ) -> Iterator[list[Pieza]]:
         """En orden: cuanto mas arriba, mas se prefiere ante un empate."""
         yield rotar_180(base, area)
         yield espejo_x(base, area)
@@ -152,7 +177,7 @@ class MejorAlterno:
                 yield a_esquina(girado, area, signo_x, signo_y)
 
 
-def elegir(trabado: bool, trabazon: Optional[Trabazon] = None) -> Trabazon:
+def elegir(trabado: bool, trabazon: Trabazon | None = None) -> Trabazon:
     """Trabazon a usar segun las restricciones."""
     if not trabado:
         return SinTrabazon()

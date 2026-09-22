@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import pytest
+from invariantes import TOL, fuera_del_area, sin_solapamientos_3d
 
 from arrume import Caja, Pallet, Restricciones, construir_arrume
 from arrume.domain.errors import CajaNoCabe
 from arrume.stacking import area_disponible
-from invariantes import TOL, fuera_del_area, sin_solapamientos_3d
 
 CONFIGS = [
     ((120, 100, 15), (40, 30, 25), 5, True, 0),

@@ -10,27 +10,26 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Optional, Union
 
 from .errors import ConfiguracionInvalida
 
-Numero = Union[int, float]
+Numero = int | float
 
 
 def _validar_numero(valor: object, nombre: str) -> None:
     if isinstance(valor, bool) or not isinstance(valor, (int, float)):
         raise ConfiguracionInvalida(
-            "{} debe ser un numero, no {}.".format(nombre, type(valor).__name__)
+            f"{nombre} debe ser un numero, no {type(valor).__name__}."
         )
     if not math.isfinite(valor):
-        raise ConfiguracionInvalida("{} debe ser un numero finito.".format(nombre))
+        raise ConfiguracionInvalida(f"{nombre} debe ser un numero finito.")
 
 
 def _validar_positivo(valor: object, nombre: str) -> None:
     _validar_numero(valor, nombre)
     if valor <= 0:  # type: ignore[operator]
         raise ConfiguracionInvalida(
-            "{} debe ser mayor que cero (recibido {}).".format(nombre, valor)
+            f"{nombre} debe ser mayor que cero (recibido {valor})."
         )
 
 
@@ -38,7 +37,7 @@ def _validar_no_negativo(valor: object, nombre: str) -> None:
     _validar_numero(valor, nombre)
     if valor < 0:  # type: ignore[operator]
         raise ConfiguracionInvalida(
-            "{} no puede ser negativo (recibido {}).".format(nombre, valor)
+            f"{nombre} no puede ser negativo (recibido {valor})."
         )
 
 
@@ -105,20 +104,18 @@ class Restricciones:
     niveles: int
     trabado: bool = True
     vuelo: Numero = 0
-    altura_max: Optional[Numero] = None
-    peso_caja: Optional[Numero] = None
-    peso_max: Optional[Numero] = None
+    altura_max: Numero | None = None
+    peso_caja: Numero | None = None
+    peso_max: Numero | None = None
 
     def __post_init__(self) -> None:
         if isinstance(self.niveles, bool) or not isinstance(self.niveles, int):
             raise ConfiguracionInvalida(
-                "Los niveles deben ser un entero, no {}.".format(
-                    type(self.niveles).__name__
-                )
+                f"Los niveles deben ser un entero, no {type(self.niveles).__name__}."
             )
         if self.niveles < 1:
             raise ConfiguracionInvalida(
-                "Debe haber al menos 1 nivel (recibido {}).".format(self.niveles)
+                f"Debe haber al menos 1 nivel (recibido {self.niveles})."
             )
         if not isinstance(self.trabado, bool):
             raise ConfiguracionInvalida("El trabado debe ser True o False.")
@@ -200,7 +197,7 @@ class Colocacion:
         return self.z + self.alto
 
     @property
-    def cuerpo(self) -> tuple:
+    def cuerpo(self) -> tuple[Numero, ...]:
         """Origen y dimensiones, como los espera la capa de dibujo."""
         return (self.x, self.y, self.z, self.ancho, self.profundidad, self.alto)
 
@@ -212,10 +209,10 @@ class Arrume:
     pallet: Pallet
     caja: Caja
     restricciones: Restricciones
-    patron_base: tuple
-    cajas: tuple
+    patron_base: tuple[Pieza, ...]
+    cajas: tuple[Colocacion, ...]
     estrategia: str
-    patron_alterno: tuple = ()
+    patron_alterno: tuple[Pieza, ...] = ()
     trabazon: str = ""
 
     def __post_init__(self) -> None:
@@ -239,7 +236,7 @@ class Arrume:
         return self.pallet.alto + self.niveles * self.caja.alto
 
     @property
-    def peso_total(self) -> Optional[Numero]:
+    def peso_total(self) -> Numero | None:
         if self.restricciones.peso_caja is None:
             return None
         return self.total_cajas * self.restricciones.peso_caja

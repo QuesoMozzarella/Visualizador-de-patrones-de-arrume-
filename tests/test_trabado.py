@@ -13,6 +13,7 @@ es que el informe lo diga en vez de aparentarlo.
 from __future__ import annotations
 
 import pytest
+from invariantes import fuera_del_area, sin_solapamientos_2d
 
 from arrume import Caja, Pallet, Restricciones, construir_arrume
 from arrume.domain.models import Area
@@ -25,7 +26,6 @@ from arrume.trabazon import (
     cajas_calcadas,
     calidad,
 )
-from invariantes import fuera_del_area, sin_solapamientos_2d
 
 # Configuraciones donde el giro de 180 grados NO trababa
 ANTES_NO_TRABABAN = [

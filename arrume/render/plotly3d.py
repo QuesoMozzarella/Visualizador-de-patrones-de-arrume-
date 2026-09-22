@@ -6,7 +6,7 @@ exportar a otro formato, se agrega otro adaptador y el dominio no se toca.
 
 from __future__ import annotations
 
-from typing import List, Optional, Sequence
+from collections.abc import Sequence
 
 import plotly.graph_objects as go
 
@@ -30,7 +30,9 @@ PALETA = ["#7fb3d5", "#a9dfbf", "#f9e79f", "#f5b7b1", "#d7bde2", "#a3e4d7"]
 _Cuerpo = Sequence[Numero]  # (x, y, z, dx, dy, dz)
 
 
-def _vertices(x, y, z, dx, dy, dz):
+def _vertices(
+    x: Numero, y: Numero, z: Numero, dx: Numero, dy: Numero, dz: Numero
+) -> list[tuple[Numero, Numero, Numero]]:
     return [
         (x, y, z), (x + dx, y, z), (x + dx, y + dy, z), (x, y + dy, z),
         (x, y, z + dz), (x + dx, y, z + dz),
@@ -42,7 +44,7 @@ def malla(
     cuerpos: Sequence[_Cuerpo],
     color: str,
     nombre: str,
-    etiquetas: Optional[Sequence[str]] = None,
+    etiquetas: Sequence[str] | None = None,
     opacidad: float = 1.0,
 ) -> go.Mesh3d:
     """Une varias cajas en un solo Mesh3d (mas rapido que uno por caja)."""
@@ -83,11 +85,11 @@ def aristas(
     )
 
 
-def piezas_pallet(pallet: Pallet) -> List[tuple]:
+def piezas_pallet(pallet: Pallet) -> list[tuple[Numero, ...]]:
     """Plataforma estilo europallet: tabla superior, tacos y tabla inferior."""
     t = max(2, pallet.alto * 0.15)     # espesor de las tablas
     h = pallet.alto - 2 * t            # alto de los tacos
-    piezas = [
+    piezas: list[tuple[Numero, ...]] = [
         (0, 0, pallet.alto - t, pallet.ancho, pallet.profundidad, t),
         (0, 0, 0, pallet.ancho, pallet.profundidad, t),
     ]
@@ -95,13 +97,14 @@ def piezas_pallet(pallet: Pallet) -> List[tuple]:
         ancho_taco = pallet.ancho * 0.12
         for f in (0.0, 0.5, 1.0):      # tres tacos a lo largo de X
             piezas.append(
-                (f * (pallet.ancho - ancho_taco), 0, t, ancho_taco, pallet.profundidad, h)
+                (f * (pallet.ancho - ancho_taco), 0, t,
+                 ancho_taco, pallet.profundidad, h)
             )
     return piezas
 
 
 def construir_figura(
-    arrume: Arrume, paleta: Optional[Sequence[str]] = None
+    arrume: Arrume, paleta: Sequence[str] | None = None
 ) -> go.Figure:
     """Arma la figura 3D completa: pallet, niveles de cajas y aristas."""
     colores = list(paleta) if paleta else PALETA
@@ -115,27 +118,26 @@ def construir_figura(
     for nivel in range(arrume.niveles):
         del_nivel = [c for c in arrume.cajas if c.nivel == nivel]
         etiquetas = [
-            "Nivel {} - caja {}".format(nivel + 1, n + 1)
+            f"Nivel {nivel + 1} - caja {n + 1}"
             for n in range(len(del_nivel))
         ]
         fig.add_trace(
             malla(
                 [c.cuerpo for c in del_nivel],
                 colores[nivel % len(colores)],
-                "Nivel {}".format(nivel + 1),
+                f"Nivel {nivel + 1}",
                 etiquetas,
             )
         )
 
     fig.add_trace(aristas([c.cuerpo for c in arrume.cajas]))
 
+    titulo = (
+        f"Arrume: {arrume.total_cajas} cajas = {arrume.cajas_por_nivel} por nivel "
+        f"x {arrume.niveles} niveles - {arrume.altura_total} cm de alto"
+    )
     fig.update_layout(
-        title="Arrume: {} cajas = {} por nivel x {} niveles - {} cm de alto".format(
-            arrume.total_cajas,
-            arrume.cajas_por_nivel,
-            arrume.niveles,
-            arrume.altura_total,
-        ),
+        title=titulo,
         scene=dict(
             xaxis_title="Ancho (X) cm",
             yaxis_title="Profundidad (Y) cm",
@@ -154,7 +156,7 @@ class Plotly3D:
 
     nombre = "plotly 3d"
 
-    def __init__(self, paleta: Optional[Sequence[str]] = None) -> None:
+    def __init__(self, paleta: Sequence[str] | None = None) -> None:
         self.paleta = list(paleta) if paleta else PALETA
 
     def render(self, arrume: Arrume) -> go.Figure:

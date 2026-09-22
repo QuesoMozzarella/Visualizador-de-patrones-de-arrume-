@@ -10,18 +10,21 @@ from __future__ import annotations
 
 import argparse
 import sys
-from typing import List, Optional, Sequence
+from collections.abc import Callable, Sequence
 
 from .domain.errors import ArrumeError
 from .domain.models import Caja, Numero, Pallet, Restricciones
 from .reporting import formatear
 from .stacking import construir_arrume
-from .trabazon import MejorAlterno, Rotacion180
+from .trabazon import MejorAlterno, Rotacion180, Trabazon
 
 _SALIDA_POR_DEFECTO = "arrume.html"
 
 # Modos de trabazon que se pueden pedir por linea de comandos
-TRABAZONES = {"mejor": MejorAlterno, "rotacion": Rotacion180}
+TRABAZONES: dict[str, Callable[[], Trabazon]] = {
+    "mejor": MejorAlterno,
+    "rotacion": Rotacion180,
+}
 
 
 def _numero(texto: str) -> Numero:
@@ -29,7 +32,7 @@ def _numero(texto: str) -> Numero:
     try:
         valor = float(texto)
     except ValueError:
-        raise argparse.ArgumentTypeError("'{}' no es un numero.".format(texto))
+        raise argparse.ArgumentTypeError(f"'{texto}' no es un numero.") from None
     return int(valor) if valor.is_integer() else valor
 
 
@@ -108,7 +111,7 @@ def construir_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     """Punto de entrada. Devuelve el codigo de salida del proceso."""
     args = construir_parser().parse_args(argv)
 
@@ -127,7 +130,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             pallet, caja, restricciones, trabazon=TRABAZONES[args.trabazon]()
         )
     except ArrumeError as error:
-        print("Error: {}".format(error), file=sys.stderr)
+        print(f"Error: {error}", file=sys.stderr)
         return 2
 
     print(formatear(arrume))
@@ -138,7 +141,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
         figura = Plotly3D().render(arrume)
         ruta = ExportadorHTML(args.html).exportar(figura, args.salida, args.abrir)
-        print("\nGrafico guardado en {}".format(ruta))
+        print(f"\nGrafico guardado en {ruta}")
         if args.html == "cdn":
             print(
                 "(carga la libreria por internet; con --html completo queda "

@@ -11,14 +11,12 @@ no multiplique las claves de la memoizacion ni pierda una caja por 1e-15 cm.
 
 from __future__ import annotations
 
-from typing import Dict, List, Tuple
-
 from ..domain.models import Area, Numero, Pieza
 from .base import centrar
 
 _DECIMALES = 6
 
-_Rect = Tuple[Numero, Numero, Numero, Numero]
+_Rect = tuple[Numero, Numero, Numero, Numero]
 
 
 def _r(valor: Numero) -> Numero:
@@ -31,7 +29,7 @@ def _cuantas(total: Numero, paso: Numero) -> int:
     return int(round(total / paso, _DECIMALES))
 
 
-def _cortes(limite: Numero, a: Numero, b: Numero) -> List[Numero]:
+def _cortes(limite: Numero, a: Numero, b: Numero) -> list[Numero]:
     """Posiciones de corte utiles: todo i*a + j*b que quepa en 'limite'."""
     vals = set()
     i = 0
@@ -49,14 +47,14 @@ def _mejor(
     profundidad: Numero,
     a: Numero,
     b: Numero,
-    memo: Dict[Tuple[Numero, Numero], List[_Rect]],
-) -> List[_Rect]:
+    memo: dict[tuple[Numero, Numero], list[_Rect]],
+) -> list[_Rect]:
     """Mejor acomodo de cajas a*b dentro de un rectangulo ancho*profundidad."""
     clave = (_r(ancho), _r(profundidad))
     if clave in memo:
         return memo[clave]
 
-    mejor: List[_Rect] = []
+    mejor: list[_Rect] = []
 
     # Opcion A: un bloque uniforme, en cada una de las dos orientaciones
     for dx, dy in ((a, b), (b, a)):
@@ -93,7 +91,7 @@ class Guillotina:
 
     nombre = "guillotina"
 
-    def generar(self, area: Area, caja: Area) -> List[Pieza]:
+    def generar(self, area: Area, caja: Area) -> list[Pieza]:
         crudo = _mejor(area.ancho, area.profundidad, caja.ancho, caja.profundidad, {})
         if not crudo:
             return []

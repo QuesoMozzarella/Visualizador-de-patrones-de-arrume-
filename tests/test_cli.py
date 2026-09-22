@@ -74,7 +74,8 @@ def test_se_puede_pedir_la_trabazon_vieja(capsys):
 
 
 def test_por_defecto_usa_la_trabazon_que_mas_traba(capsys):
-    assert main(["--sin-grafico", "--pallet", "120", "100", "--caja", "33", "27", "20"]) == 0
+    assert main(["--sin-grafico", "--pallet", "120", "100",
+                 "--caja", "33", "27", "20"]) == 0
     salida = capsys.readouterr().out
     assert "mejor alterno" in salida
     assert "0 de 12 cajas calcadas" in salida

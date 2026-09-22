@@ -11,7 +11,7 @@ para todas las estrategias por igual):
 
 from __future__ import annotations
 
-from typing import List, Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable
 
 from ..domain.models import Area, Pieza
 
@@ -22,12 +22,12 @@ class EstrategiaPatron(Protocol):
 
     nombre: str
 
-    def generar(self, area: Area, caja: Area) -> List[Pieza]:
+    def generar(self, area: Area, caja: Area) -> list[Pieza]:
         """Devuelve las piezas de un nivel, o una lista vacia si no cabe ninguna."""
         ...
 
 
-def centrar(piezas: List[Pieza], area: Area) -> List[Pieza]:
+def centrar(piezas: list[Pieza], area: Area) -> list[Pieza]:
     """Desplaza el patron para que quede centrado sobre el area."""
     if not piezas:
         return []

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+from invariantes import fuera_del_area, mide_la_caja, sin_solapamientos_2d
 
 from arrume.domain.models import Area, Pieza
 from arrume.packing import Guillotina
@@ -14,7 +15,6 @@ from arrume.packing.transformaciones import (
     holgura,
     rotar_180,
 )
-from invariantes import fuera_del_area, mide_la_caja, sin_solapamientos_2d
 
 AREAS_Y_CAJAS = [
     ((120, 100), (40, 30)),

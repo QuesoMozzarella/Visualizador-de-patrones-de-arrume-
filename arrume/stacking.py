@@ -6,7 +6,7 @@ No imprime, no escribe archivos y no termina el proceso.
 
 from __future__ import annotations
 
-from typing import List, Optional, Sequence
+from collections.abc import Sequence
 
 from .domain.errors import CajaNoCabe, ConfiguracionInvalida
 from .domain.models import Area, Arrume, Caja, Colocacion, Pallet, Pieza, Restricciones
@@ -27,8 +27,8 @@ def construir_arrume(
     pallet: Pallet,
     caja: Caja,
     restricciones: Restricciones,
-    estrategia: Optional[EstrategiaPatron] = None,
-    trabazon: Optional[Trabazon] = None,
+    estrategia: EstrategiaPatron | None = None,
+    trabazon: Trabazon | None = None,
 ) -> Arrume:
     """Genera el arrume completo apilando los patrones nivel a nivel.
 
@@ -42,22 +42,20 @@ def construir_arrume(
     base = tuple(estrategia.generar(area, caja.base))
     if not base:
         raise CajaNoCabe(
-            "Ninguna caja de {} x {} cm cabe en un area de {} x {} cm.".format(
-                caja.ancho, caja.profundidad, area.ancho, area.profundidad
-            )
+            f"Ninguna caja de {caja.ancho} x {caja.profundidad} cm cabe "
+            f"en un area de {area.ancho} x {area.profundidad} cm."
         )
 
     modo = elegir(restricciones.trabado, trabazon)
     alterno = tuple(modo.alterno(base, area, caja.base, estrategia))
     if len(alterno) != len(base):
         raise ConfiguracionInvalida(
-            "La trabazon '{}' devolvio {} cajas y el patron base tiene {}: "
-            "todos los niveles deben llevar las mismas cajas.".format(
-                modo.nombre, len(alterno), len(base)
-            )
+            f"La trabazon '{modo.nombre}' devolvio {len(alterno)} cajas "
+            f"y el patron base tiene {len(base)}: "
+            "todos los niveles deben llevar las mismas cajas."
         )
 
-    cajas: List[Colocacion] = []
+    cajas: list[Colocacion] = []
     for nivel in range(restricciones.niveles):
         z = pallet.alto + nivel * caja.alto
         patron = base if nivel % 2 == 0 else alterno
@@ -81,7 +79,7 @@ def _colocar(
     nivel: int,
     alto: float,
     vuelo: float,
-) -> List[Colocacion]:
+) -> list[Colocacion]:
     """Lleva un patron del sistema del area al del pallet, a la altura z."""
     return [
         Colocacion(

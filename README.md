@@ -93,6 +93,15 @@ pytest
 Los tests comprueban invariantes del acomodo (ninguna caja fuera del area,
 ningun solapamiento, totales coherentes) contra todas las estrategias.
 
+Las tres comprobaciones que corre la CI, y que conviene correr antes de
+cada commit:
+
+```bash
+ruff check .    # estilo, imports y trampas comunes
+mypy            # tipos del paquete arrume
+pytest          # los 220 tests
+```
+
 ## Pendiente
 
 - Aplicar `altura_max` / `peso_max` como restricciones duras, no solo avisos.
