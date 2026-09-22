@@ -78,3 +78,17 @@ def test_por_defecto_usa_la_trabazon_que_mas_traba(capsys):
     salida = capsys.readouterr().out
     assert "mejor alterno" in salida
     assert "0 de 12 cajas calcadas" in salida
+
+
+def test_el_html_se_genera_liviano_por_defecto(tmp_path, capsys):
+    destino = tmp_path / "salida.html"
+    assert main(["--salida", str(destino), "--no-abrir"]) == 0
+    assert destino.stat().st_size < 500_000
+    assert "carga la libreria por internet" in capsys.readouterr().out
+
+
+def test_se_puede_pedir_el_html_autocontenido(tmp_path, capsys):
+    destino = tmp_path / "completo.html"
+    assert main(["--salida", str(destino), "--no-abrir", "--html", "completo"]) == 0
+    assert destino.stat().st_size > 1_000_000
+    assert "carga la libreria por internet" not in capsys.readouterr().out

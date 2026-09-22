@@ -22,6 +22,7 @@ python -m arrume --sin-grafico                     # solo el informe
 python -m arrume --caja 37.5 27.5 22 --altura-max 180 --peso-caja 12.5
 python -m arrume --sin-trabado                     # apila en columna
 python -m arrume --trabazon rotacion               # el trabado del proyecto original
+python -m arrume --html completo                   # HTML sin depender de internet
 python -m arrume --help                            # todas las opciones
 ```
 
@@ -49,7 +50,7 @@ El nucleo no sabe que existe plotly; el dibujo es un adaptador del borde.
 | `arrume/trabazon.py` | Mide la trabazon y decide el patron de los niveles impares. |
 | `arrume/stacking.py` | Apila los patrones nivel a nivel y arma el `Arrume`. |
 | `arrume/reporting.py` | Calcula el informe y lo formatea. Devuelve datos y texto, no imprime. |
-| `arrume/render/` | Unico lugar que importa plotly. |
+| `arrume/render/` | Unico lugar que importa plotly. `Renderer` arma la figura, `Exportador` la guarda. |
 | `arrume/cli.py` | Unica capa que imprime y que fija el codigo de salida. |
 
 Para agregar un patron nuevo basta con una clase que cumpla el protocolo
@@ -77,6 +78,12 @@ Las 3 restantes son teselados perfectos: el nivel llena el pallet exacto y
 no existe recolocacion posible. En ese caso el informe avisa en vez de
 aparentar una trabazon que no hay; dejar vuelo suele desbloquearlas.
 
+## El archivo HTML
+
+Por defecto el HTML carga plotly desde su CDN: **56 KB** en vez de los
+**4.8 MB** que ocupaba antes con la libreria incrustada, pero hace falta
+internet para abrirlo. Con `--html completo` vuelve a quedar autocontenido.
+
 ## Tests
 
 ```bash
@@ -88,5 +95,4 @@ ningun solapamiento, totales coherentes) contra todas las estrategias.
 
 ## Pendiente
 
-- Exportar con `include_plotlyjs="cdn"` para bajar el HTML de ~4.8 MB a ~50 KB.
 - Aplicar `altura_max` / `peso_max` como restricciones duras, no solo avisos.

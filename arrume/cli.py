@@ -96,6 +96,12 @@ def construir_parser() -> argparse.ArgumentParser:
         help="no abrir el navegador al terminar",
     )
     parser.add_argument(
+        "--html", choices=["cdn", "completo"], default="cdn",
+        help="'cdn' deja la libreria fuera del archivo (~50 KB, necesita "
+             "internet al abrirlo); 'completo' la incrusta (~4.8 MB, sirve "
+             "sin conexion)",
+    )
+    parser.add_argument(
         "--sin-grafico", action="store_true",
         help="solo imprimir el informe, sin generar el HTML",
     )
@@ -127,10 +133,17 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     print(formatear(arrume))
 
     if not args.sin_grafico:
-        from .render.plotly3d import construir_figura, exportar_html
+        # Se importa aqui para que el informe no dependa de tener plotly
+        from .render.plotly3d import ExportadorHTML, Plotly3D
 
-        ruta = exportar_html(construir_figura(arrume), args.salida, args.abrir)
+        figura = Plotly3D().render(arrume)
+        ruta = ExportadorHTML(args.html).exportar(figura, args.salida, args.abrir)
         print("\nGrafico guardado en {}".format(ruta))
+        if args.html == "cdn":
+            print(
+                "(carga la libreria por internet; con --html completo queda "
+                "autocontenido)"
+            )
 
     return 0
 

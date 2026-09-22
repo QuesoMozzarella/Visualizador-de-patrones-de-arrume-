@@ -100,8 +100,11 @@ def piezas_pallet(pallet: Pallet) -> List[tuple]:
     return piezas
 
 
-def construir_figura(arrume: Arrume) -> go.Figure:
+def construir_figura(
+    arrume: Arrume, paleta: Optional[Sequence[str]] = None
+) -> go.Figure:
     """Arma la figura 3D completa: pallet, niveles de cajas y aristas."""
+    colores = list(paleta) if paleta else PALETA
     fig = go.Figure()
 
     plataforma = piezas_pallet(arrume.pallet)
@@ -118,7 +121,7 @@ def construir_figura(arrume: Arrume) -> go.Figure:
         fig.add_trace(
             malla(
                 [c.cuerpo for c in del_nivel],
-                PALETA[nivel % len(PALETA)],
+                colores[nivel % len(colores)],
                 "Nivel {}".format(nivel + 1),
                 etiquetas,
             )
@@ -146,7 +149,40 @@ def construir_figura(arrume: Arrume) -> go.Figure:
     return fig
 
 
-def exportar_html(fig: go.Figure, ruta: str, abrir: bool = True) -> str:
-    """Guarda la figura como HTML autocontenido y devuelve la ruta."""
-    fig.write_html(ruta, auto_open=abrir)
-    return ruta
+class Plotly3D:
+    """Renderer: arma la figura 3D del arrume."""
+
+    nombre = "plotly 3d"
+
+    def __init__(self, paleta: Optional[Sequence[str]] = None) -> None:
+        self.paleta = list(paleta) if paleta else PALETA
+
+    def render(self, arrume: Arrume) -> go.Figure:
+        return construir_figura(arrume, self.paleta)
+
+
+class ExportadorHTML:
+    """Exportador: escribe la figura como pagina HTML.
+
+    'cdn' deja la libreria fuera del archivo (~50 KB, necesita internet
+    para abrirlo); 'completo' la incrusta (~4.8 MB, se abre sin conexion).
+    """
+
+    extension = ".html"
+
+    MODOS = {"cdn": "cdn", "completo": True}
+
+    def __init__(self, modo: str = "cdn") -> None:
+        if modo not in self.MODOS:
+            raise ValueError(
+                "Modo de HTML desconocido: {}. Use {}.".format(
+                    modo, " o ".join(sorted(self.MODOS))
+                )
+            )
+        self.modo = modo
+
+    def exportar(self, figura: go.Figure, ruta: str, abrir: bool = False) -> str:
+        figura.write_html(
+            ruta, include_plotlyjs=self.MODOS[self.modo], auto_open=abrir
+        )
+        return ruta
