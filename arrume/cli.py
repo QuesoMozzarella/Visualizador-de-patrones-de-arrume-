@@ -10,21 +10,15 @@ from __future__ import annotations
 
 import argparse
 import sys
-from collections.abc import Callable, Sequence
+from collections.abc import Sequence
 
 from .domain.errors import ArrumeError
 from .domain.models import Caja, Numero, Pallet, Restricciones
 from .reporting import formatear
 from .stacking import construir_arrume
-from .trabazon import MejorAlterno, Rotacion180, Trabazon
+from .trabazon import TRABAZONES
 
 _SALIDA_POR_DEFECTO = "arrume.html"
-
-# Modos de trabazon que se pueden pedir por linea de comandos
-TRABAZONES: dict[str, Callable[[], Trabazon]] = {
-    "mejor": MejorAlterno,
-    "rotacion": Rotacion180,
-}
 
 
 def _numero(texto: str) -> Numero:

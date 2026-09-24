@@ -25,6 +25,24 @@ _ARISTAS = [
     (0, 4), (1, 5), (2, 6), (3, 7),
 ]
 
+# PENDIENTE: esta paleta no pasa la validacion de color y hay que resteparla.
+#
+# El color de los niveles no es decorativo: es lo que deja ver donde termina
+# un nivel y empieza el siguiente, o sea la trabazon. Medido sobre la
+# superficie clara, falla en cuatro puntos:
+#
+#   - vision normal: la peor pareja contigua, #d7bde2 (lila) y #f5b7b1
+#     (rosa), separa 7.5 cuando el minimo admisible es 15. Dos niveles
+#     seguidos cuestan de distinguir incluso con vision de color perfecta.
+#   - daltonismo: la peor pareja, #a3e4d7 y #d7bde2, cae a 5.1 (deutan)
+#     y 6.9 (tritan).
+#   - croma: los seis tonos quedan por debajo del minimo y tiran a gris.
+#   - contraste contra el fondo: los seis por debajo de 3:1.
+#
+# Arreglarlo es elegir seis tonos que pasen el validador; no hace falta
+# tocar nada mas que esta lista, porque el renderer ya la recibe como
+# parametro (Plotly3D(paleta=...)) y los tests solo exigen que los niveles
+# tengan colores distintos entre si.
 PALETA = ["#7fb3d5", "#a9dfbf", "#f9e79f", "#f5b7b1", "#d7bde2", "#a3e4d7"]
 
 _Cuerpo = Sequence[Numero]  # (x, y, z, dx, dy, dz)

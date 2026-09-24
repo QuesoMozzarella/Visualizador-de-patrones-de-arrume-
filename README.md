@@ -15,6 +15,27 @@ pip install -e ".[dev]"
 
 ## Uso
 
+### La interfaz
+
+Doble clic en `Arrume.bat`. Se abre el navegador con el formulario a un
+lado y el arrume en 3D al otro, y se recalcula al cambiar cualquier medida.
+Deja la ventana negra abierta mientras lo usas.
+
+Sin doble clic:
+
+```bash
+arrume-gui                     # o: python -m arrume.web.servidor
+arrume-gui --puerto 8080       # puerto fijo en vez de uno libre cualquiera
+arrume-gui --no-abrir          # no abrir el navegador al arrancar
+```
+
+Escucha solo en `127.0.0.1` y no necesita internet: la libreria de dibujo
+la sirve el propio programa desde el paquete instalado.
+
+### La linea de comandos
+
+Lo mismo sin interfaz, util para repetir o automatizar:
+
 ```bash
 python -m arrume                                   # configuracion por defecto
 python -m arrume --pallet 120 100 --caja 40 30 25 --niveles 5
@@ -51,12 +72,38 @@ El nucleo no sabe que existe plotly; el dibujo es un adaptador del borde.
 | `arrume/stacking.py` | Apila los patrones nivel a nivel y arma el `Arrume`. |
 | `arrume/reporting.py` | Calcula el informe y lo formatea. Devuelve datos y texto, no imprime. |
 | `arrume/render/` | Unico lugar que importa plotly. `Renderer` arma la figura, `Exportador` la guarda. |
+| `arrume/web/` | La interfaz: `servicio.py` traduce el formulario, `servidor.py` es el adaptador HTTP, `estaticos/` es la pagina. |
 | `arrume/cli.py` | Unica capa que imprime y que fija el codigo de salida. |
 
 Para agregar un patron nuevo basta con una clase que cumpla el protocolo
 `EstrategiaPatron` (`generar(area, caja) -> list[Pieza]`): el motor de
 apilado no se toca. Lo mismo con `Trabazon` (`alterno(...) -> list[Pieza]`)
 para probar otra forma de alternar los niveles.
+
+## La interfaz por dentro
+
+La web es otro adaptador del borde, hermano de la CLI: el nucleo no sabe
+que existe. Esta montada sobre la libreria estandar para no obligar a
+instalar un framework, pero sin atar a ninguno.
+
+- **Back:** las rutas son funciones puras `Peticion -> Respuesta` reunidas
+  en `RUTAS`. Montarlas sobre Flask o FastAPI es mapear ese diccionario, y
+  se prueban sin abrir ningun puerto.
+- **Front:** la pagina es un archivo estatico cualquiera dentro de
+  `estaticos/`. Sustituirla por el build de un React o un Vue es copiar su
+  carpeta ahi; la API no cambia.
+
+La API que consume la pagina, y que consumiria cualquier otra:
+
+| Ruta | Que hace |
+| --- | --- |
+| `GET /` | la pagina |
+| `GET /plotly.js` | la libreria de dibujo, desde el paquete local |
+| `POST /api/arrume` | recibe el formulario, devuelve figura, cifras, avisos e informe |
+| `GET /descargar` | el arrume como HTML autocontenido |
+
+Un formulario invalido no es un error de HTTP: `POST /api/arrume` responde
+200 con `{"ok": false, "error": "..."}` y la pagina lo muestra donde toca.
 
 ## Trabazon
 
@@ -99,9 +146,13 @@ cada commit:
 ```bash
 ruff check .    # estilo, imports y trampas comunes
 mypy            # tipos del paquete arrume
-pytest          # los 220 tests
+pytest          # los 271 tests
 ```
 
 ## Pendiente
 
+- La paleta de los niveles del 3D no pasa la validacion de color: dos
+  niveles contiguos cuestan de distinguir incluso con vision normal. El
+  detalle medido esta anotado sobre la constante `PALETA`, en
+  `arrume/render/plotly3d.py`.
 - Aplicar `altura_max` / `peso_max` como restricciones duras, no solo avisos.

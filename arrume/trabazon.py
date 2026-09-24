@@ -11,7 +11,7 @@ como llenar UN nivel, la otra como encadenar DOS.
 
 from __future__ import annotations
 
-from collections.abc import Iterator, Sequence
+from collections.abc import Callable, Iterator, Sequence
 from typing import Protocol, runtime_checkable
 
 from .domain.models import Area, Numero, Pieza
@@ -175,6 +175,13 @@ class MejorAlterno:
             yield rotar_180(girado, area)
             for signo_x, signo_y in ((1, 1), (-1, -1)):
                 yield a_esquina(girado, area, signo_x, signo_y)
+
+
+# Trabazones que se pueden elegir por nombre desde la CLI o la interfaz
+TRABAZONES: dict[str, Callable[[], Trabazon]] = {
+    "mejor": MejorAlterno,
+    "rotacion": Rotacion180,
+}
 
 
 def elegir(trabado: bool, trabazon: Trabazon | None = None) -> Trabazon:

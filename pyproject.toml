@@ -22,9 +22,14 @@ dev = [
 
 [project.scripts]
 arrume = "arrume.cli:main"
+arrume-gui = "arrume.web.servidor:main"
 
 [tool.setuptools.packages.find]
 include = ["arrume*"]
+
+[tool.setuptools.package-data]
+# La pagina de la interfaz viaja con el paquete
+"arrume.web" = ["estaticos/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
