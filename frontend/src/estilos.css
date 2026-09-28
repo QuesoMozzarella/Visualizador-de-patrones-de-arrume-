@@ -1,0 +1,343 @@
+/* ------------------------------------------------------------------
+   Bodega: piso de concreto, estarcido negro, amarillo de demarcacion.
+   Tipografia de norma industrial (Bahnschrift es la DIN de Windows),
+   servida por el sistema: la interfaz no necesita internet.
+   ------------------------------------------------------------------ */
+:root {
+  --piso: #e4e6e3;
+  --hoja: #ffffff;
+  --tinta: #000000;
+  --grafito: #4a4e4b;
+  --tenue: #8c918d;
+  --filete: #c9cdc9;
+  --seguridad: #ffc400;
+  --rechazo: #b3261e;
+
+  --norma: Bahnschrift, "DIN Alternate", "Franklin Gothic Medium",
+           "Arial Narrow", system-ui, sans-serif;
+  --texto: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  background: var(--piso);
+  color: var(--tinta);
+  font: 14px/1.5 var(--texto);
+}
+
+/* ---- Encabezado: la hoja de carga pegada al pallet ---------------- */
+.franja {
+  background: var(--tinta);
+  color: var(--hoja);
+  padding: 9px 18px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+.marca {
+  font-family: var(--norma);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.ficha-titulo {
+  display: flex;
+  gap: 18px;
+  font-family: var(--norma);
+  font-size: 14px;
+  color: #cfd2cf;
+  font-variant-numeric: tabular-nums;
+}
+.ficha-titulo span { display: flex; gap: 7px; }
+.ficha-titulo i { font-style: normal; color: var(--seguridad); }
+
+/* ---- Rejilla ------------------------------------------------------ */
+.taller {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 16px;
+  padding: 14px 16px 20px;
+  align-items: start;
+}
+@media (max-width: 880px) { .taller { grid-template-columns: 1fr; } }
+
+/* ---- Columna de medidas ------------------------------------------ */
+.medidas {
+  background: var(--hoja);
+  border: 1px solid var(--tinta);
+  padding: 0 12px 12px;
+}
+fieldset { border: 0; padding: 0; margin: 11px 0 0; }
+legend {
+  padding: 0;
+  font-family: var(--norma);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.medidas fieldset + fieldset { border-top: 1px solid var(--filete); padding-top: 9px; }
+
+.terna { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 5px; }
+.par { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 5px; }
+.uno { margin-top: 6px; }
+.dato { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.dato label { font-size: 11.5px; color: var(--grafito); }
+
+input[type="number"], select {
+  width: 100%;
+  padding: 5px 7px;
+  font: 15px/1.3 var(--norma);
+  font-variant-numeric: tabular-nums;
+  color: var(--tinta);
+  background: var(--hoja);
+  border: 1px solid var(--filete);
+  border-radius: 0;
+}
+input[type="number"]:hover, select:hover { border-color: var(--grafito); }
+input:focus-visible, select:focus-visible, button:focus-visible {
+  outline: 2px solid var(--tinta);
+  outline-offset: 1px;
+}
+input:disabled, select:disabled { color: var(--tenue); background: #f3f4f2; }
+
+.marcar { display: flex; align-items: center; gap: 7px; margin-top: 9px; }
+.marcar input { width: 15px; height: 15px; accent-color: var(--tinta); }
+.nota-campo { margin: 6px 0 0; font-size: 11.5px; color: var(--tenue); }
+
+/* ---- Mandos ------------------------------------------------------- */
+.mandos { display: grid; gap: 6px; margin-top: 13px; }
+.fila-mandos { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+button {
+  font: 14px var(--texto);
+  padding: 7px 10px;
+  border: 1px solid var(--tinta);
+  border-radius: 0;
+  background: var(--hoja);
+  color: var(--tinta);
+  cursor: pointer;
+}
+button:hover { background: #eceeeb; }
+.calcular {
+  background: var(--seguridad);
+  font-family: var(--norma);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 9px 10px;
+}
+.calcular:hover { background: #ffd23f; }
+
+/* ---- Arrume y ficha ----------------------------------------------- */
+.carga { display: grid; gap: 16px; min-width: 0; }
+.carga.viejo #arrume, .carga.viejo .cifras { opacity: 0.3; }
+
+#arrume {
+  background: var(--hoja);
+  border: 1px solid var(--tinta);
+  height: clamp(320px, 50vh, 640px);
+}
+
+/* Un solo bloque dividido por filetes, como un packing slip */
+.cifras {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  gap: 1px;
+  background: var(--tinta);
+  border: 1px solid var(--tinta);
+}
+.celda { background: var(--hoja); padding: 9px 11px 10px; }
+.celda.alerta-celda { background: var(--seguridad); }
+.cantidad {
+  font-family: var(--norma);
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.005em;
+  font-variant-numeric: tabular-nums;
+}
+.cantidad u { text-decoration: none; font-size: 15px; font-weight: 400; color: var(--grafito); }
+.celda.alerta-celda .cantidad u { color: var(--tinta); }
+.rotulo { margin-top: 2px; font-size: 12px; color: var(--grafito); }
+.celda.alerta-celda .rotulo { color: var(--tinta); }
+.detalle { margin-top: 1px; font-size: 11.5px; color: var(--tenue); }
+.celda.alerta-celda .detalle { color: #3d3000; }
+
+/* ---- Avisos: la convencion del piso de bodega --------------------- */
+.banda { display: flex; border: 1px solid var(--tinta); background: var(--hoja); }
+.banda .cinta { flex: none; width: 12px; }
+.banda .dicho { padding: 9px 12px; font-size: 13px; }
+.banda .dicho b { font-family: var(--norma); font-size: 15px; display: block; }
+
+.banda.precaucion { background: var(--seguridad); }
+.banda.precaucion .cinta {
+  background: repeating-linear-gradient(
+    -45deg, var(--tinta) 0 6px, var(--seguridad) 6px 12px);
+}
+.banda.parada .cinta { background: var(--rechazo); }
+.banda.parada .dicho b { color: var(--rechazo); }
+
+/* ---- Pisos: la pila, con el piso de arriba arriba ----------------- */
+.pila { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 3px; }
+.pila li {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+  padding-left: 4px;
+  border-left: 4px solid transparent;
+}
+.pila li.a-mano { border-left-color: var(--seguridad); }
+.pila .n {
+  font-family: var(--norma);
+  font-size: 14px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--grafito);
+}
+.pila select { font-size: 14px; padding: 3px 6px; }
+
+/* ---- Vistas ------------------------------------------------------- */
+.vistas { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.pestana {
+  font-family: var(--norma);
+  font-size: 15px;
+  padding: 5px 12px;
+  border: 1px solid var(--tinta);
+  background: var(--hoja);
+}
+.pestana[aria-pressed="true"] { background: var(--tinta); color: var(--hoja); }
+
+/* ---- Editor del acomodo ------------------------------------------- */
+.editor {
+  background: var(--hoja);
+  border: 1px solid var(--tinta);
+  padding: 10px;
+  display: grid;
+  gap: 9px;
+}
+.herramientas { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.herramientas .hueco { flex: 1; }
+.herramientas button { padding: 5px 9px; font-size: 13px; }
+.herramientas button:disabled { color: var(--tenue); border-color: var(--filete); cursor: default; }
+.herramientas .estado-acomodo { font-size: 12px; color: var(--grafito); }
+
+#plano {
+  width: 100%;
+  height: clamp(280px, 52vh, 600px);
+  display: block;
+  touch-action: none;
+  outline: none;
+}
+#plano:focus-visible { outline: 2px solid var(--tinta); outline-offset: 2px; }
+.suelo { fill: #f2f2ef; stroke: var(--tinta); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+.caja { fill: #e8ddc8; stroke: var(--tinta); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+.caja.girada { fill: #cbb994; }
+#plano .caja { cursor: grab; }
+#plano .caja:active { cursor: grabbing; }
+#plano .caja.elegida { fill: var(--seguridad); stroke-width: 2.6; }
+#plano .caja.choca { fill: #f6d5d2; stroke: var(--rechazo); stroke-width: 2.2; }
+.pie-plano { font-size: 12px; color: var(--grafito); font-variant-numeric: tabular-nums; }
+.pie-plano b { font-family: var(--norma); font-size: 14px; color: var(--tinta); }
+.pie-plano .mal { color: var(--rechazo); font-weight: 600; }
+.ayuda { margin: 0; font-size: 12px; color: var(--tenue); }
+.ayuda kbd {
+  font: 11px var(--texto);
+  border: 1px solid var(--filete);
+  padding: 0 4px;
+  background: #f7f7f5;
+}
+
+/* ---- Pisos desde arriba ------------------------------------------- */
+.plantas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+}
+.planta { background: var(--hoja); border: 1px solid var(--tinta); padding: 8px 10px 10px; min-width: 0; }
+.planta h3 {
+  margin: 0 0 6px;
+  font-family: var(--norma);
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.planta h3 small { font-weight: 400; color: var(--grafito); font-size: 13px; }
+.planta svg { width: 100%; height: auto; display: block; }
+.leyenda-plantas { margin: 0 0 8px; font-size: 12px; color: var(--grafito); }
+.leyenda-plantas i {
+  display: inline-block; width: 11px; height: 11px; vertical-align: -1px;
+  border: 1px solid var(--tinta); margin: 0 3px 0 10px;
+}
+.leyenda-plantas i:first-child { margin-left: 0; }
+.leyenda-plantas i.derecha { background: #e8ddc8; }
+.leyenda-plantas i.girada { background: #cbb994; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* ---- Columna izquierda y guardados ---------------------------------- */
+.columna { display: grid; gap: 16px; align-content: start; }
+.columna fieldset:first-child { margin-top: 11px; }
+input[type="text"], .guardar input {
+  width: 100%;
+  padding: 5px 7px;
+  font: 14px/1.3 var(--texto);
+  border: 1px solid var(--filete);
+  border-radius: 0;
+  background: var(--hoja);
+  color: var(--tinta);
+}
+.guardar { display: grid; gap: 6px; margin-top: 6px; }
+.mensaje { margin: 6px 0 0; font-size: 12px; color: var(--grafito); }
+.mensaje.malo { color: var(--rechazo); font-weight: 600; }
+.lista-guardados { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 1px; background: var(--filete); border: 1px solid var(--filete); }
+.lista-guardados li { background: var(--hoja); padding: 6px 8px; display: grid; gap: 4px; }
+.lista-guardados li.abierto { box-shadow: inset 4px 0 0 var(--seguridad); }
+.guardado-nombre { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; min-width: 0; }
+.guardado-nombre b { font-family: var(--norma); font-size: 14px; overflow-wrap: anywhere; }
+.guardado-nombre small { color: var(--tenue); font-size: 11px; white-space: nowrap; }
+.acciones { display: flex; gap: 6px; align-items: center; font-size: 13px; }
+.acciones button { padding: 3px 9px; font-size: 13px; }
+button.peligro { border-color: var(--rechazo); color: var(--rechazo); }
+button:disabled { color: var(--tenue); border-color: var(--filete); cursor: default; }
+.cargando { padding: 24px 16px; }
+
+.calcular:disabled { background: #f3f4f2; color: var(--tenue); border-color: var(--filete); }
+
+/* ---- Caja y pallet --------------------------------------------------- */
+.modelos { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.modelo { margin: 0; background: var(--hoja); border: 1px solid var(--tinta); }
+.modelo figcaption {
+  padding: 7px 11px;
+  border-bottom: 1px solid var(--tinta);
+  font-family: var(--norma);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+.modelo .nota-campo { padding: 0 11px 11px; }
+.modelo-lienzo { height: clamp(300px, 48vh, 560px); }
+
+/* ---- Colores de las cajas --------------------------------------------- */
+.selector-colores {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  font-size: 13px;
+}
+.selector-colores label { font-family: var(--norma); font-size: 14px; }
+.selector-colores select { width: auto; font-size: 14px; padding: 3px 6px; }
+.selector-colores input[type="color"] {
+  width: 40px; height: 28px; padding: 1px; border: 1px solid var(--filete); background: var(--hoja);
+}
+.leyenda-colores { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; color: var(--grafito); }
+.muestra { display: inline-flex; align-items: center; gap: 4px; }
+.muestra i { width: 14px; height: 14px; border: 1px solid var(--tinta); display: inline-block; }

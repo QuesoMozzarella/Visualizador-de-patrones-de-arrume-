@@ -8,10 +8,15 @@ __pycache__/
 *.py[cod]
 *.egg-info/
 build/
-dist/
 
-# Artefactos generados por el programa
-*.html
+# Base de datos local de los arrumes guardados (carpeta instance de Flask)
+backend/instance/
+*.sqlite3
+
+# Frontend: dependencias y build
+node_modules/
+frontend/dist/
+*.tsbuildinfo
 
 # Herramientas
 .pytest_cache/
