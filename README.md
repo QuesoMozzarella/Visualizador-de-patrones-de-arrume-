@@ -26,6 +26,7 @@ Se ingresan las medidas del pallet y de la caja, se define a mano cómo van las 
 - [Estructura del proyecto](#estructura-del-proyecto)
 - [Pruebas e integración continua](#pruebas-e-integración-continua)
 - [Limitaciones conocidas](#limitaciones-conocidas)
+- [Licencia](#licencia)
 
 ---
 
@@ -141,8 +142,8 @@ En producción Flask sirve también el build de React, de modo que la aplicació
 ## Instalación
 
 ```bash
-git clone <url-del-repositorio> arrume
-cd arrume
+git clone https://github.com/QuesoMozzarella/Visualizador-de-patrones-de-arrume-.git
+cd Visualizador-de-patrones-de-arrume-
 
 # Backend
 python -m venv .venv
@@ -351,6 +352,7 @@ El nombre del archivo se deriva del nombre del arrume, por ejemplo `arrume-galle
 │       └── logica/             Reglas puras con sus pruebas: pisos, editor,
 │                               colores, modelos 3D e imágenes del informe
 ├── docs/capturas/              Imágenes de este documento
+├── LICENSE                     Licencia GPL v2
 └── .github/workflows/ci.yml    Integración continua
 ```
 
@@ -386,3 +388,9 @@ GitHub Actions ejecuta en cada push y pull request:
 - El pallet se modela siempre como un pallet de bloques tipo europallet. Otros tipos se pueden agregar en `piezasPallet` (`frontend/src/logica/modelos3d.ts`).
 - El piso cruzado se define como el acomodo normal girado 180 grados.
 - La interfaz está en español y las medidas en centímetros.
+
+---
+
+## Licencia
+
+Distribuido bajo la GNU General Public License, versión 2. El texto completo está en [LICENSE](LICENSE).
